@@ -667,7 +667,11 @@ static __strong NSData *CRLFCRLF;
             
             NSUInteger usedLength = 0;
             
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-variable"
             BOOL success = [reason getBytes:(char *)mutablePayload.mutableBytes + sizeof(uint16_t) maxLength:payload.length - sizeof(uint16_t) usedLength:&usedLength encoding:NSUTF8StringEncoding options:NSStringEncodingConversionExternalRepresentation range:NSMakeRange(0, reason.length) remainingRange:&remainingRange];
+#pragma clang diagnostic pop
+            
             
             assert(success);
             assert(remainingRange.length == 0);
@@ -1031,7 +1035,10 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
             [self _handleFrameHeader:header curData:self->_currentFrameData];
         } else {
             [self _addConsumerWithDataLength:extra_bytes_needed callback:^(SRWebSocket *self, NSData *data) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-variable"
                 size_t mapped_size = data.length;
+#pragma clang diagnostic pop
                 const void *mapped_buffer = data.bytes;
                 size_t offset = 0;
                 
