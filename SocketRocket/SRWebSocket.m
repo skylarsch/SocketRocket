@@ -594,7 +594,6 @@ static __strong NSData *CRLFCRLF;
         
 
         [SSLOptions setValue:[NSNumber numberWithBool:NO] forKey:(__bridge id)kCFStreamSSLValidatesCertificateChain];
-        NSLog(@"SocketRocket: In debug mode.  Allowing connection to any root cert");
 
         
         [_outputStream setProperty:SSLOptions
