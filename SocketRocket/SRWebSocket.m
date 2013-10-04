@@ -135,7 +135,7 @@ static inline void SRFastLog(NSString *format, ...);
 static NSString *newSHA1String(const char *bytes, size_t length) {
     uint8_t md[CC_SHA1_DIGEST_LENGTH];
     
-    CC_SHA1(bytes, length, md);
+    CC_SHA1(bytes, (unsigned int)length, md);
     
     size_t buffer_size = ((sizeof(md) * 3 + 2) / 2);
     
@@ -576,7 +576,7 @@ static __strong NSData *CRLFCRLF;
     CFReadStreamRef readStream = NULL;
     CFWriteStreamRef writeStream = NULL;
     
-    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)host, port, &readStream, &writeStream);
+    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)host, (UInt32)port, &readStream, &writeStream);
     
     _outputStream = CFBridgingRelease(writeStream);
     _inputStream = CFBridgingRelease(readStream);
@@ -1473,7 +1473,7 @@ static const size_t SRFrameHeaderOverhead = 32;
                 uint8_t buffer[bufferSize];
                 
                 while (_inputStream.hasBytesAvailable) {
-                    int bytes_read = [_inputStream read:buffer maxLength:bufferSize];
+                    NSInteger bytes_read = [_inputStream read:buffer maxLength:bufferSize];
                     
                     if (bytes_read > 0) {
                         [_readBuffer appendBytes:buffer length:bytes_read];
@@ -1646,7 +1646,7 @@ static inline void SRFastLog(NSString *format, ...)  {
 
 static inline int32_t validate_dispatch_data_partial_string(NSData *data) {
     const void * contents = [data bytes];
-    long size = [data length];
+    int32_t size = (int32_t)[data length];
     
     const uint8_t *str = (const uint8_t *)contents;
     
