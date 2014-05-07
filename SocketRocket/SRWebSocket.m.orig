@@ -135,7 +135,23 @@ static NSString *newSHA1String(const char *bytes, size_t length) {
     assert(length <= UINT32_MAX);
     CC_SHA1(bytes, (CC_LONG)length, md);
     
+<<<<<<< HEAD
+    CC_SHA1(bytes, (unsigned int)length, md);
+    
+    size_t buffer_size = ((sizeof(md) * 3 + 2) / 2);
+    
+    char *buffer =  (char *)malloc(buffer_size);
+    
+    int len = b64_ntop(md, CC_SHA1_DIGEST_LENGTH, buffer, buffer_size);
+    if (len == -1) {
+        free(buffer);
+        return nil;
+    } else{
+        return [[NSString alloc] initWithBytesNoCopy:buffer length:len encoding:NSASCIIStringEncoding freeWhenDone:YES];
+    }
+=======
     return [[NSData dataWithBytes:md length:CC_SHA1_DIGEST_LENGTH] base64Encoding];
+>>>>>>> 656283dd195414723cd473746923db50abd34cb2
 }
 
 @implementation NSData (SRWebSocket)
@@ -920,7 +936,10 @@ static inline BOOL closeCodeIsValid(int closeCode) {
             }
         }
     } else {
+<<<<<<< HEAD
+=======
         assert(frame_header.payload_length <= SIZE_T_MAX);
+>>>>>>> 656283dd195414723cd473746923db50abd34cb2
         [self _addConsumerWithDataLength:(size_t)frame_header.payload_length callback:^(SRWebSocket *self, NSData *newData) {
             if (isControlFrame) {
                 [self _handleFrameWithData:newData opCode:frame_header.opcode];
@@ -1374,85 +1393,60 @@ static const size_t SRFrameHeaderOverhead = 32;
 - (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode;
 {
     if (_secure && !_pinnedCertFound && (eventCode == NSStreamEventHasBytesAvailable || eventCode == NSStreamEventHasSpaceAvailable)) {
-        
-        NSArray *sslCerts = [_urlRequest SR_SSLPinnedCertificates];
-        if (sslCerts) {
-            SecTrustRef secTrust = (__bridge SecTrustRef)[aStream propertyForKey:(__bridge id)kCFStreamPropertySSLPeerTrust];
-            if (secTrust) {
-                NSInteger numCerts = SecTrustGetCertificateCount(secTrust);
-                for (NSInteger i = 0; i < numCerts && !_pinnedCertFound; i++) {
-                    SecCertificateRef cert = SecTrustGetCertificateAtIndex(secTrust, i);
-                    NSData *certData = CFBridgingRelease(SecCertificateCopyData(cert));
-                    
-                    for (id ref in sslCerts) {
-                        SecCertificateRef trustedCert = (__bridge SecCertificateRef)ref;
-                        NSData *trustedCertData = CFBridgingRelease(SecCertificateCopyData(trustedCert));
+        @try {
+            NSArray *sslCerts = [_urlRequest SR_SSLPinnedCertificates];
+            if (sslCerts) {
+                SecTrustRef secTrust = (__bridge SecTrustRef)[aStream propertyForKey:(__bridge id)kCFStreamPropertySSLPeerTrust];
+                if (secTrust) {
+                    NSInteger numCerts = SecTrustGetCertificateCount(secTrust);
+                    for (NSInteger i = 0; i < numCerts && !_pinnedCertFound; i++) {
+                        SecCertificateRef cert = SecTrustGetCertificateAtIndex(secTrust, i);
+                        NSData *certData = CFBridgingRelease(SecCertificateCopyData(cert));
                         
-                        if ([trustedCertData isEqualToData:certData]) {
-                            _pinnedCertFound = YES;
-                            break;
+                        for (id ref in sslCerts) {
+                            SecCertificateRef trustedCert = (__bridge SecCertificateRef)ref;
+                            NSData *trustedCertData = CFBridgingRelease(SecCertificateCopyData(trustedCert));
+                            
+                            if ([trustedCertData isEqualToData:certData]) {
+                                _pinnedCertFound = YES;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            
-            if (!_pinnedCertFound) {
-                dispatch_async(_workQueue, ^{
-                    [self _failWithError:[NSError errorWithDomain:@"org.lolrus.SocketRocket" code:23556 userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Invalid server cert"] forKey:NSLocalizedDescriptionKey]]];
-                });
-                return;
-            }
-        }
-    }
-    
-    dispatch_async(_workQueue, ^{
-        switch (eventCode) {
-            case NSStreamEventOpenCompleted: {
-                SRFastLog(@"NSStreamEventOpenCompleted %@", aStream);
-                if (self.readyState >= SR_CLOSING) {
+                
+                if (!_pinnedCertFound) {
+                    dispatch_async(_workQueue, ^{
+                        [self _failWithError:[NSError errorWithDomain:@"org.lolrus.SocketRocket" code:23556 userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Invalid server cert"] forKey:NSLocalizedDescriptionKey]]];
+                    });
                     return;
                 }
-                assert(_readBuffer);
-                
-                if (self.readyState == SR_CONNECTING && aStream == _inputStream) {
-                    [self didConnect];
-                }
-                [self _pumpWriting];
-                [self _pumpScanner];
-                break;
             }
-                
-            case NSStreamEventErrorOccurred: {
-                SRFastLog(@"NSStreamEventErrorOccurred %@ %@", aStream, [[aStream streamError] copy]);
-                /// TODO specify error better!
-                [self _failWithError:aStream.streamError];
-                _readBufferOffset = 0;
-                [_readBuffer setLength:0];
-                break;
-                
-            }
-                
-            case NSStreamEventEndEncountered: {
-                [self _pumpScanner];
-                SRFastLog(@"NSStreamEventEndEncountered %@", aStream);
-                if (aStream.streamError) {
-                    [self _failWithError:aStream.streamError];
-                } else {
-                    if (self.readyState != SR_CLOSED) {
-                        self.readyState = SR_CLOSED;
-                        _selfRetain = nil;
+        }
+        @catch (NSException __unused *exception) {
+            
+        }
+    }
+
+    dispatch_async(_workQueue, ^{
+        @try {
+            switch (eventCode) {
+                case NSStreamEventOpenCompleted: {
+                    SRFastLog(@"NSStreamEventOpenCompleted %@", aStream);
+                    if (self.readyState >= SR_CLOSING) {
+                        return;
                     }
+                    assert(_readBuffer);
                     
-                    if (!_sentClose && !_failed) {
-                        _sentClose = YES;
-                        // If we get closed in this state it's probably not clean because we should be sending this when we send messages
-                        [self _performDelegateBlock:^{
-                            if ([self.delegate respondsToSelector:@selector(webSocket:didCloseWithCode:reason:wasClean:)]) {
-                                [self.delegate webSocket:self didCloseWithCode:0 reason:@"Stream end encountered" wasClean:NO];
-                            }
-                        }];
+                    if (self.readyState == SR_CONNECTING && aStream == _inputStream) {
+                        [self didConnect];
                     }
+                    [self _pumpWriting];
+                    [self _pumpScanner];
+                    break;
                 }
+<<<<<<< HEAD
+=======
                 
                 break;
             }
@@ -1464,30 +1458,78 @@ static const size_t SRFrameHeaderOverhead = 32;
                 
                 while (_inputStream.hasBytesAvailable) {
                     NSInteger bytes_read = [_inputStream read:buffer maxLength:bufferSize];
+>>>>>>> 656283dd195414723cd473746923db50abd34cb2
                     
-                    if (bytes_read > 0) {
-                        [_readBuffer appendBytes:buffer length:bytes_read];
-                    } else if (bytes_read < 0) {
-                        [self _failWithError:_inputStream.streamError];
+                case NSStreamEventErrorOccurred: {
+                    SRFastLog(@"NSStreamEventErrorOccurred %@ %@", aStream, [[aStream streamError] copy]);
+                    /// TODO specify error better!
+                    [self _failWithError:aStream.streamError];
+                    _readBufferOffset = 0;
+                    [_readBuffer setLength:0];
+                    break;
+                    
+                }
+                    
+                case NSStreamEventEndEncountered: {
+                    [self _pumpScanner];
+                    SRFastLog(@"NSStreamEventEndEncountered %@", aStream);
+                    if (aStream.streamError) {
+                        [self _failWithError:aStream.streamError];
+                    } else {
+                        if (self.readyState != SR_CLOSED) {
+                            self.readyState = SR_CLOSED;
+                            _selfRetain = nil;
+                        }
+                        
+                        if (!_sentClose && !_failed) {
+                            _sentClose = YES;
+                            // If we get closed in this state it's probably not clean because we should be sending this when we send messages
+                            [self _performDelegateBlock:^{
+                                if ([self.delegate respondsToSelector:@selector(webSocket:didCloseWithCode:reason:wasClean:)]) {
+                                    [self.delegate webSocket:self didCloseWithCode:0 reason:@"Stream end encountered" wasClean:NO];
+                                }
+                            }];
+                        }
                     }
                     
-                    if (bytes_read != bufferSize) {
-                        break;
-                    }
-                };
-                [self _pumpScanner];
-                break;
+                    break;
+                }
+                    
+                case NSStreamEventHasBytesAvailable: {
+                    SRFastLog(@"NSStreamEventHasBytesAvailable %@", aStream);
+                    const int bufferSize = 2048;
+                    uint8_t buffer[bufferSize];
+                    
+                    while (_inputStream.hasBytesAvailable) {
+                        NSInteger bytes_read = [_inputStream read:buffer maxLength:bufferSize];
+                        
+                        if (bytes_read > 0) {
+                            [_readBuffer appendBytes:buffer length:bytes_read];
+                        } else if (bytes_read < 0) {
+                            [self _failWithError:_inputStream.streamError];
+                        }
+                        
+                        if (bytes_read != bufferSize) {
+                            break;
+                        }
+                    };
+                    [self _pumpScanner];
+                    break;
+                }
+                    
+                case NSStreamEventHasSpaceAvailable: {
+                    SRFastLog(@"NSStreamEventHasSpaceAvailable %@", aStream);
+                    [self _pumpWriting];
+                    break;
+                }
+                    
+                default:
+                    SRFastLog(@"(default)  %@", aStream);
+                    break;
             }
-                
-            case NSStreamEventHasSpaceAvailable: {
-                SRFastLog(@"NSStreamEventHasSpaceAvailable %@", aStream);
-                [self _pumpWriting];
-                break;
-            }
-                
-            default:
-                SRFastLog(@"(default)  %@", aStream);
-                break;
+        }
+        @catch (NSException __unused *exception) {
+            
         }
     });
 }
@@ -1633,6 +1675,11 @@ static inline int32_t validate_dispatch_data_partial_string(NSData *data) {
     int32_t size = (int32_t)[data length];
 
     const void * contents = [data bytes];
+<<<<<<< HEAD
+    int32_t size = (int32_t)[data length];
+    
+=======
+>>>>>>> 656283dd195414723cd473746923db50abd34cb2
     const uint8_t *str = (const uint8_t *)contents;
     
     UChar32 codepoint = 1;
