@@ -102,10 +102,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B2EB6AB115DB60F60035AD92 /* CFNetwork.framework in Frameworks */,
-				B2EB6AA015DB5D530035AD92 /* CoreServices.framework in Frameworks */,
-				B2EB6AA115DB5D530035AD92 /* Foundation.framework in Frameworks */,
-				B2EB6AA215DB5D530035AD92 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,11 +213,6 @@
 		F6B208221450F597009315AF = {
 			isa = PBXGroup;
 			children = (
-				B2EB6AB015DB60F60035AD92 /* CFNetwork.framework */,
-				B2EB6AAE15DB5EB80035AD92 /* libicucore.dylib */,
-				B2EB6A9D15DB5D530035AD92 /* CoreServices.framework */,
-				B2EB6A9E15DB5D530035AD92 /* Foundation.framework */,
-				B2EB6A9F15DB5D530035AD92 /* Security.framework */,
 				F6B208321450F597009315AF /* SocketRocket */,
 				F6BDA807145900D200FE3253 /* SRWebSocketTests */,
 				F62417EA14D52F3C003CE997 /* TestChat */,
@@ -240,7 +231,6 @@
 				F6BDA802145900D200FE3253 /* SRWebSocketTests.octest */,
 				F62417E314D52F3C003CE997 /* TestChat.app */,
 				F668C880153E91210044DBAC /* SocketRocket.framework */,
-				B2EB6A7315DB5C800035AD92 /* libSocketRocketOSXLibrary.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -256,7 +246,6 @@
 				F6BDA803145900D200FE3253 /* SenTestingKit.framework */,
 				F62417E514D52F3C003CE997 /* UIKit.framework */,
 				F62417E814D52F3C003CE997 /* CoreGraphics.framework */,
-				B2EB6A7415DB5C800035AD92 /* Cocoa.framework */,
 				F668C883153E91210044DBAC /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -310,9 +299,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B2EB6A9815DB5D160035AD92 /* base64.h in Headers */,
-				B2EB6A9915DB5D160035AD92 /* SRWebSocket.h in Headers */,
-				B2EB6A9B15DB5D160035AD92 /* NSData+SRB64Additions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -349,7 +335,6 @@
 			);
 			name = SocketRocketOSXLibrary;
 			productName = SocketRocketOSXLibrary;
-			productReference = B2EB6A7315DB5C800035AD92 /* libSocketRocketOSXLibrary.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		F62417E214D52F3C003CE997 /* TestChat */ = {
@@ -429,6 +414,7 @@
 		F6B208241450F597009315AF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0510;
 				LastUpgradeCheck = 0510;
 			};
 			buildConfigurationList = F6B208271450F597009315AF /* Build configuration list for PBXProject "SocketRocket" */;
@@ -501,9 +487,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B2EB6A9715DB5D160035AD92 /* base64.c in Sources */,
-				B2EB6A9A15DB5D160035AD92 /* SRWebSocket.m in Sources */,
-				B2EB6A9C15DB5D160035AD92 /* NSData+SRB64Additions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
