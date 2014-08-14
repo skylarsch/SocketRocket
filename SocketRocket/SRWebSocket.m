@@ -1445,6 +1445,7 @@ static const size_t SRFrameHeaderOverhead = 32;
             if (self.readyState == SR_CONNECTING && aStream == _inputStream) {
                 [self didConnect];
             }
+            break;
         }
                 
         case NSStreamEventEndEncountered: {
