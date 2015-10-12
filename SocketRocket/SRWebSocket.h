@@ -14,8 +14,8 @@
 //   limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
-#import <Security/SecCertificate.h>
+@import Foundation;
+@import Security.SecCertificate;
 
 typedef NS_ENUM(NSInteger, SRReadyState) {
     SR_CONNECTING   = 0,
