@@ -783,6 +783,7 @@
 		F6B2083B1450F597009315AF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				DSTROOT = /tmp/SocketRocket.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -802,6 +803,7 @@
 		F6B2083C1450F597009315AF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				DSTROOT = /tmp/SocketRocket.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
